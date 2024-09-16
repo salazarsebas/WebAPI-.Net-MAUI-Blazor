@@ -64,6 +64,5 @@ Si tienes alguna pregunta o comentario, puedes ponerte en contacto con el desarr
 - **GitHub**: [salazarsebas](https://github.com/salazarsebas)
 
 ---
-
 ¡Gracias por tu interés en este proyecto!
 ```
