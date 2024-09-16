@@ -62,7 +62,5 @@ Si tienes alguna pregunta o comentario, puedes ponerte en contacto con el desarr
 
 - **Correo Electrónico**: [sebastian.salazar.solano@gmail.com](mailto:sebastian.salazar.solano@gmail.com)
 - **GitHub**: [salazarsebas](https://github.com/salazarsebas)
-
 ---
 ¡Gracias por tu interés en este proyecto!
-```
