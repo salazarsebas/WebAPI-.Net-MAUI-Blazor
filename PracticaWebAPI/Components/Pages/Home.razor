@@ -1,0 +1,105 @@
+﻿@page "/"
+@using PracticaWebAPI.Models;
+@using System.Text.Json
+@using System.IO
+@using System.Net.Http.Json;
+
+<h1>Hello, world!</h1>
+
+<p>Bienvenidos a esta aplicación.</p>
+
+<input @bind="searchTerm" placeholder="Buscar por país" />
+<button @onclick="BuscarPais">Buscar</button>
+
+<table class="list-unstyled">
+    <tr>
+        <th>Continente</th>
+        <th>País</th>
+        <th>Capital</th>
+        <th>Población</th>
+        <th>Bandera</th>
+    </tr>
+    @foreach (var paises in ListaPaisesFiltrada)
+    {
+    <tr>
+        <td>@paises.continente</td>
+        <td>@paises.pais</td>
+        <td>@paises.capitalp</td>
+        <td>@paises.poblacion</td>
+        <td>
+            <img src="@paises.bandera" alt=" Bandera del pais @paises.pais" width="100" />
+        </td>
+    </tr>
+    <br />
+    }
+</table>
+
+@code {
+    private List<Parametros> ListaPaises = new();
+    private List<Parametros> ListaPaisesFiltrada = new();
+    private string searchTerm;
+
+    private async Task AgregarPaisesAsync()
+    {
+        using (var client = new HttpClient())
+        {
+            client.BaseAddress = new Uri("https://restcountries.com/v3.1/");
+            HttpResponseMessage response = await client.GetAsync("all");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var paises = await response.Content.ReadFromJsonAsync<List<PaisResponse>>();
+                if (paises != null)
+                {
+                    ListaPaises = paises.Select(p => new Parametros
+                        {
+                            continente = p.continents != null && p.continents.Length > 0 ? p.continents[0] : "N/A",
+                            pais = p.name.common,
+                            capitalp = p.capital != null && p.capital.Length > 0 ? p.capital[0] : "N/A",
+                            poblacion = p.population,
+                            bandera = p.flags.svg
+                        }).ToList();
+                    ListaPaisesFiltrada = ListaPaises;
+                }
+            }
+        }
+    }
+
+    private void BuscarPais()
+    {
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            ListaPaisesFiltrada = ListaPaises
+                .Where(p => p.pais.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+        else
+        {
+            ListaPaisesFiltrada = ListaPaises;
+        }
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await AgregarPaisesAsync();
+    }
+
+    public class PaisResponse
+    {
+        public string[] continents { get; set; }
+        public Name name { get; set; }
+        public Flags flags { get; set; }
+        public int population { get; set; }
+        public string[] capital { get; set; }
+    }
+
+    public class Name
+    {
+        public string common { get; set; }
+    }
+
+    public class Flags
+    {
+        public string svg { get; set; }
+    }
+}
